@@ -1,12 +1,26 @@
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Space
 from .serializers import SpaceSerializer
+from rest_framework import serializers
 
 class SpaceViewSet(viewsets.ModelViewSet):
     queryset = Space.objects.all()
     serializer_class = SpaceSerializer
+
+    def retrieve(self, request, pk=None):
+        try:
+            user = get_object_or_404(Space, pk=pk)
+            serializer = SpaceSerializer(user)
+            return Response(serializer.data)
+        except Http404:
+            return Response(
+                {'error': "The requested Space does not exist."}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -45,17 +59,23 @@ class SpaceViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-    def destroy(self) :
-        instance = self.get_object()
-        instance.delete()
-        return Response(
-            {"message": "Space deleted successfully."},
-            status=status.HTTP_204_NO_CONTENT
-        )
+    def destroy(self,request, pk=None) :
+        try:
+            instance = self.get_object()
+            instance.delete()
+            return Response(
+                {"message": "Space deleted successfully."},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"error": "The requested Space does not exist."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
     @action(detail=False, methods=['GET'])
-    def available_spaces(self):
+    def available_spaces(self, request):
         available_spaces = Space.objects.filter(availability=True)
         serializer = self.get_serializer(available_spaces, many=True)
         return Response(serializer.data)
