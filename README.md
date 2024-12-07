@@ -1,7 +1,7 @@
 # :office: Soil Co-Working Space Management System
 backend service for managing Soil Spaces, a co-working and community-focused workspace. 
 
-## :dizzy: Features:
+## :dizzy: Features
 - Browse available workspace details.
 - Book workspaces with time-slot selection.
 - Admin management of spaces and bookings.
