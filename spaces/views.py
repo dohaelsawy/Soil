@@ -6,10 +6,19 @@ from rest_framework.decorators import action
 from .models import Space
 from .serializers import SpaceSerializer
 from rest_framework import serializers
+from rest_framework.permissions import AllowAny, IsAdminUser
 
 class SpaceViewSet(viewsets.ModelViewSet):
     queryset = Space.objects.all()
     serializer_class = SpaceSerializer
+
+    def get_permissions(self):
+        if self.action == 'available_spaces':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
 
     def retrieve(self, request, pk=None):
         try:
