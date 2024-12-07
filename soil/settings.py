@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'spaces',
+    'bookings',
     'rest_framework',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'soil.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAdminUser',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': "Soil Management API's",
+    'DESCRIPTION': 'Backend services for a Co-Working Space Management System',
+    'VERSION': '1.0.0',
+    'EXCLUDE_FROM_SCHEMA': [
+        'bookings_destroy',
+    ]
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
