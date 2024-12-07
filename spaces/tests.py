@@ -173,7 +173,7 @@ class SpacesViewTest(TestCase) :
     def test_available_spaces_success(self):
             self.client.logout()
             response = self.client.get(
-                path='/spaces/available_spaces/',
+                path='/spaces/',
             )
             self.assertEqual(response.status_code,200)
 
@@ -182,9 +182,9 @@ class SpacesViewTest(TestCase) :
 
 
     def test_filter_by_type(self):
-        response = self.client.get('/spaces/available_spaces/?type=meeting_room')
+        response = self.client.get('/spaces/?type=meeting_room')
         self.assertEqual(len(response.data), 1)
 
     def test_filter_by_price_range(self):
-        response = self.client.get('/spaces/available_spaces/?max_price=100')
+        response = self.client.get('/spaces/?max_price=100')
         self.assertEqual(len(response.data), 2)
