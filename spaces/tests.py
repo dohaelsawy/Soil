@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 
 class SpacesViewTest(TestCase) :
 
-    # @classmethod
     def setUp(self):
+
         self.test_space1 = Space.objects.create(
             name="room1",
             type='private_office',
@@ -23,6 +23,33 @@ class SpacesViewTest(TestCase) :
             is_available=False
         )
         self.test_space2.save()
+
+        self.test_space3 = Space.objects.create(
+            name="roomA", 
+            type="meeting_room", 
+            capacity=25, 
+            price_per_hour=80, 
+            is_available=True
+        )
+        self.test_space3.save()
+        
+        self.test_space4 = Space.objects.create(
+            name="roomB", 
+            type="private_office", 
+            capacity=10, 
+            price_per_hour=150, 
+            is_available=True
+        )
+        self.test_space4.save()
+        
+        self.test_space5 = Space.objects.create(
+            name="roomC", 
+            type="meeting_room", 
+            capacity=15, 
+            price_per_hour=50, 
+            is_available=False
+        )
+        self.test_space5.save()
 
         self.admin_user = User.objects.create_superuser(
             username='admin', 
@@ -151,4 +178,13 @@ class SpacesViewTest(TestCase) :
             self.assertEqual(response.status_code,200)
 
             response_data = response.json()
-            self.assertEqual(len(response_data),1)
+            self.assertEqual(len(response_data),3)
+
+
+    def test_filter_by_type(self):
+        response = self.client.get('/spaces/available_spaces/?type=meeting_room')
+        self.assertEqual(len(response.data), 1)
+
+    def test_filter_by_price_range(self):
+        response = self.client.get('/spaces/available_spaces/?max_price=100')
+        self.assertEqual(len(response.data), 2)

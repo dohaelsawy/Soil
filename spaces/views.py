@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.exceptions import Ratelimited
 from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 
 class SpaceViewSet(viewsets.ModelViewSet):
@@ -87,6 +88,28 @@ class SpaceViewSet(viewsets.ModelViewSet):
             )
 
 
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="type", 
+                type=OpenApiTypes.STR, 
+                description="Filter spaces by type (e.g., 'meeting_room')"
+            ),
+            OpenApiParameter(
+                name="min_capacity", 
+                type=OpenApiTypes.INT, 
+                description="Filter spaces with a minimum capacity"
+            ),
+            OpenApiParameter(
+                name="max_price", 
+                type=OpenApiTypes.FLOAT, 
+                description="Filter spaces within a maximum price range"
+            ),
+        ],
+        responses={200: SpaceSerializer(many=True)},
+    )
+
     @action(detail=False, methods=['GET'])
     @method_decorator(ratelimit(key='ip', rate='5/m', method='GET', block=False))
     def available_spaces(self, request, *args, **kwargs):
@@ -96,6 +119,20 @@ class SpaceViewSet(viewsets.ModelViewSet):
                 {"error": "Too many requests. Please try again later."},
                 status=status.HTTP_429_TOO_MANY_REQUESTS
             )
-        available_spaces = Space.objects.filter(is_available=True)
-        serializer = self.get_serializer(available_spaces, many=True)
+        
+        space_type = request.query_params.get('type', None)
+        min_capacity = request.query_params.get('min_capacity', None)
+        max_price = request.query_params.get('max_price', None)
+
+
+        queryset = Space.objects.filter(is_available=True)
+
+        if space_type:
+            queryset = queryset.filter(type=space_type)
+        if min_capacity:
+            queryset = queryset.filter(capacity__gte=min_capacity)
+        if max_price:
+            queryset = queryset.filter(price_per_hour__lte=max_price)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

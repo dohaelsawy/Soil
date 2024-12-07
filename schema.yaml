@@ -447,7 +447,24 @@ paths:
           description: No response body
   /spaces/available_spaces/:
     get:
-      operationId: spaces_available_spaces_retrieve
+      operationId: spaces_available_spaces_list
+      parameters:
+      - in: query
+        name: max_price
+        schema:
+          type: number
+          format: float
+        description: Filter spaces within a maximum price range
+      - in: query
+        name: min_capacity
+        schema:
+          type: integer
+        description: Filter spaces with a minimum capacity
+      - in: query
+        name: type
+        schema:
+          type: string
+        description: Filter spaces by type (e.g., 'meeting_room')
       tags:
       - spaces
       security:
@@ -459,7 +476,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Space'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Space'
           description: ''
 components:
   schemas:
