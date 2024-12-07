@@ -217,38 +217,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Bookings'
           description: ''
-    put:
-      operationId: bookings_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this bookings.
-        required: true
-      tags:
-      - bookings
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BookingsPatch'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/BookingsPatch'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/BookingsPatch'
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BookingsPatch'
-          description: ''
     patch:
       operationId: bookings_partial_update
       parameters:
@@ -281,31 +249,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingsPatch'
           description: ''
-    delete:
-      operationId: bookings_destroy
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this bookings.
-        required: true
-      tags:
-      - bookings
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '204':
-          description: No response body
   /spaces/:
     get:
       operationId: spaces_list
+      parameters:
+      - in: query
+        name: max_price
+        schema:
+          type: number
+          format: float
+        description: Filter spaces within a maximum price range
+      - in: query
+        name: min_capacity
+        schema:
+          type: integer
+        description: Filter spaces with a minimum capacity
+      - in: query
+        name: type
+        schema:
+          type: string
+        description: Filter spaces by type (e.g., 'meeting_room')
       tags:
       - spaces
       security:
       - cookieAuth: []
       - basicAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -353,39 +322,6 @@ paths:
         required: true
       tags:
       - spaces
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Space'
-          description: ''
-    put:
-      operationId: spaces_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this space.
-        required: true
-      tags:
-      - spaces
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Space'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Space'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Space'
-        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -445,41 +381,6 @@ paths:
       responses:
         '204':
           description: No response body
-  /spaces/available_spaces/:
-    get:
-      operationId: spaces_available_spaces_list
-      parameters:
-      - in: query
-        name: max_price
-        schema:
-          type: number
-          format: float
-        description: Filter spaces within a maximum price range
-      - in: query
-        name: min_capacity
-        schema:
-          type: integer
-        description: Filter spaces with a minimum capacity
-      - in: query
-        name: type
-        schema:
-          type: string
-        description: Filter spaces by type (e.g., 'meeting_room')
-      tags:
-      - spaces
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Space'
-          description: ''
 components:
   schemas:
     Bookings:
