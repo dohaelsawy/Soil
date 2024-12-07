@@ -53,13 +53,12 @@ class SpaceViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    def update(self, request, **kwargs):
-        partial = kwargs.pop('partial', False)
+    def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(
             instance, 
             data=request.data, 
-            partial=partial
+            partial=True
         )
         
         try:

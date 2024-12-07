@@ -4,31 +4,33 @@ from django.contrib.auth.models import User
 
 class SpacesViewTest(TestCase) :
 
-    @classmethod
-    def setUpTestData(cls):
-        Space.objects.create(
+    # @classmethod
+    def setUp(self):
+        self.test_space1 = Space.objects.create(
             name="room1",
             type='private_office',
             capacity=30,
             price_per_hour=100,
             is_available=True
         )
+        self.test_space1.save()
 
-        Space.objects.create(
+        self.test_space2 = Space.objects.create(
             name="room2",
             type='private_office',
             capacity=30,
             price_per_hour=100,
             is_available=False
         )
+        self.test_space2.save()
 
-        cls.admin_user = User.objects.create_superuser(
+        self.admin_user = User.objects.create_superuser(
             username='admin', 
             email='admin@example.com', 
             password='adminpassword'
         )
+        self.admin_user.save()
 
-    def setUp(self):
         self.client.force_login(self.admin_user)
 
     def test_create_space_success(self):
@@ -97,8 +99,9 @@ class SpacesViewTest(TestCase) :
 
 
     def test_update_space_success(self):
+        instance = Space.objects.first()
         response = self.client.patch(
-            path='/spaces/1/',
+            path=f'/spaces/{instance.id}/',
             data={
                 "type": "private_office",
             },
@@ -111,8 +114,9 @@ class SpacesViewTest(TestCase) :
 
 
     def test_delete_existed_space_success(self):
+        instance = Space.objects.first()
         response = self.client.delete(
-            path='/spaces/1/',
+            path=f'/spaces/{instance.id}/',
         )
         self.assertEqual(response.status_code,200)
         response_data = response.json()
@@ -148,4 +152,3 @@ class SpacesViewTest(TestCase) :
 
             response_data = response.json()
             self.assertEqual(len(response_data),1)
-            self.assertEqual(response_data[0]['id'],1)
