@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .models import Space
-
+from django.contrib.auth.models import User
 
 class SpacesViewTest(TestCase) :
 
@@ -11,7 +11,7 @@ class SpacesViewTest(TestCase) :
             type='private_office',
             capacity=30,
             price_per_hour=100,
-            availability=True
+            is_available=True
         )
 
         Space.objects.create(
@@ -19,9 +19,17 @@ class SpacesViewTest(TestCase) :
             type='private_office',
             capacity=30,
             price_per_hour=100,
-            availability=False
+            is_available=False
         )
 
+        cls.admin_user = User.objects.create_superuser(
+            username='admin', 
+            email='admin@example.com', 
+            password='adminpassword'
+        )
+
+    def setUp(self):
+        self.client.force_login(self.admin_user)
 
     def test_create_space_success(self):
         response = self.client.post(
@@ -31,7 +39,7 @@ class SpacesViewTest(TestCase) :
                 "type": "meeting_room",
                 "capacity": 32,
                 "price_per_hour": 322.00,
-                "availability": False
+                "is_available": False
             },
             content_type='application/json'
         )
@@ -43,7 +51,7 @@ class SpacesViewTest(TestCase) :
         self.assertEqual(response_data['type'],"meeting_room")
         self.assertEqual(response_data['capacity'],32)
         self.assertEqual(response_data['price_per_hour'],'322.00')
-        self.assertEqual(response_data['availability'],False)
+        self.assertEqual(response_data['is_available'],False)
 
 
 
@@ -55,7 +63,7 @@ class SpacesViewTest(TestCase) :
                 "type": "meeting_room",
                 "capacity": 32,
                 "price_per_hour": "322.00",
-                "availability": False
+                "is_available": False
             },
             content_type='application/json'
         )
@@ -75,7 +83,7 @@ class SpacesViewTest(TestCase) :
                 "type": "meeting_room",
                 "capacity": -32,
                 "price_per_hour": "-322.00",
-                "availability": False
+                "is_available": False
             },
             content_type='application/json'
         )
@@ -102,24 +110,10 @@ class SpacesViewTest(TestCase) :
         self.assertEqual(response_data['type'],"private_office")
 
 
-
-
-    def test_available_spaces_success(self):
-        response = self.client.get(
-            path='/spaces/available_spaces/',
-        )
-        self.assertEqual(response.status_code,200)
-
-        response_data = response.json()
-        self.assertEqual(len(response_data),1)
-        self.assertEqual(response_data[0]['id'],1)
-
-
     def test_delete_existed_space_success(self):
         response = self.client.delete(
             path='/spaces/1/',
         )
-        print(response.content)
         self.assertEqual(response.status_code,200)
         response_data = response.json()
         self.assertEqual(response_data['message'],"Space deleted successfully.")
@@ -145,3 +139,13 @@ class SpacesViewTest(TestCase) :
         response_data = response.json()
         self.assertEqual(response_data['error'],"The requested Space does not exist.")
 
+    def test_available_spaces_success(self):
+            self.client.logout()
+            response = self.client.get(
+                path='/spaces/available_spaces/',
+            )
+            self.assertEqual(response.status_code,200)
+
+            response_data = response.json()
+            self.assertEqual(len(response_data),1)
+            self.assertEqual(response_data[0]['id'],1)
