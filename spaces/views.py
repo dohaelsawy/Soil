@@ -7,10 +7,15 @@ from .models import Space
 from .serializers import SpaceSerializer
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny, IsAdminUser
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
+from django.utils.decorators import method_decorator
+
 
 class SpaceViewSet(viewsets.ModelViewSet):
     queryset = Space.objects.all()
     serializer_class = SpaceSerializer
+    permission_classes = []
 
     def get_permissions(self):
         if self.action == 'available_spaces':
@@ -84,7 +89,14 @@ class SpaceViewSet(viewsets.ModelViewSet):
 
 
     @action(detail=False, methods=['GET'])
-    def available_spaces(self, request):
-        available_spaces = Space.objects.filter(availability=True)
+    @method_decorator(ratelimit(key='ip', rate='5/m', method='GET', block=False))
+    def available_spaces(self, request, *args, **kwargs):
+        was_limited = getattr(request, 'limited', False)
+        if was_limited:
+            return Response(
+                {"error": "Too many requests. Please try again later."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+        available_spaces = Space.objects.filter(is_available=True)
         serializer = self.get_serializer(available_spaces, many=True)
         return Response(serializer.data)

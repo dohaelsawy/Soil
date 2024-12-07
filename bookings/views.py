@@ -6,6 +6,9 @@ from .models import Bookings
 from .serializers import BookingsSerializer, BookingsPatchSerializer
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny, IsAdminUser
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
+from django.utils.decorators import method_decorator
 
 class BookingsViewSet(viewsets.ModelViewSet):
     queryset = Bookings.objects.all()
@@ -22,7 +25,16 @@ class BookingsViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
+    @method_decorator(ratelimit(key='ip', rate='5/m', method='GET', block=False))
     def retrieve(self, request, pk=None):
+
+        was_limited = getattr(request, 'limited', False)
+        if was_limited:
+            return Response(
+                {"error": "Too many requests. Please try again later."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+        
         try:
             user = get_object_or_404(Bookings, pk=pk)
             serializer = BookingsSerializer(user)
@@ -32,10 +44,19 @@ class BookingsViewSet(viewsets.ModelViewSet):
                 {'error': "The requested booking does not exist."}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
         
+        
+    @method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=False))
+    def create(self, request, *args, **kwargs):
+
+        was_limited = getattr(request, 'limited', False)
+        if was_limited:
+            return Response(
+                {"error": "Too many requests. Please try again later."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+        
+        serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
@@ -48,9 +69,9 @@ class BookingsViewSet(viewsets.ModelViewSet):
             return Response(
                 {'errors': e.detail}, 
                 status=status.HTTP_400_BAD_REQUEST
-            )
+            ) 
 
-    def partial_update(self, request, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(
             instance, 
