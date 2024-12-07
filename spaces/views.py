@@ -19,7 +19,7 @@ class SpaceViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def get_permissions(self):
-        if self.action == 'available_spaces':
+        if self.action == 'list':
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAdminUser]
@@ -110,9 +110,8 @@ class SpaceViewSet(viewsets.ModelViewSet):
         responses={200: SpaceSerializer(many=True)},
     )
 
-    @action(detail=False, methods=['GET'])
     @method_decorator(ratelimit(key='ip', rate='5/m', method='GET', block=False))
-    def available_spaces(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         was_limited = getattr(request, 'limited', False)
         if was_limited:
             return Response(
@@ -136,3 +135,11 @@ class SpaceViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+
+    @extend_schema(exclude=True)
+    def update(self, request, *args, **kwargs):
+        return Response(
+            {'error': 'Update is not permitted'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )

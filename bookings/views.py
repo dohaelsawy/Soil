@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django_ratelimit.decorators import ratelimit
 from django_ratelimit.exceptions import Ratelimited
 from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema
 
 class BookingsViewSet(viewsets.ModelViewSet):
     queryset = Bookings.objects.all()
@@ -89,8 +90,17 @@ class BookingsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+
+    @extend_schema(exclude=True)
     def destroy(self, request, *args, **kwargs):
         return Response(
             {'error': 'Deletion is not permitted'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+    
+    @extend_schema(exclude=True)
+    def update(self, request, *args, **kwargs):
+        return Response(
+            {'error': 'Update is not permitted'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
