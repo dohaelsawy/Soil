@@ -2,12 +2,14 @@
 backend service for managing Soil Spaces, a co-working and community-focused workspace. 
 
 ## :dizzy: Feactures:
-- Browse available workspace details
-- Book workspaces with time-slot selection
-- Admin management of spaces and bookings
-- Role-based authentication
-- Input validation
-- Booking conflict prevention
+- Browse available workspace details.
+- Book workspaces with time-slot selection.
+- Admin management of spaces and bookings.
+- Role-based authentication.
+- Input validation.
+- Booking conflict prevention.
+- Filter available spaces by type, capacity, or price range.
+- Integrate rate-limiting to prevent abuse of public endpoints.
 
 ## :computer: Technology Stack
 
@@ -46,4 +48,8 @@ make superuser
 - Access swagger ui on the following url:
 ```
 http://0.0.0.0:8000/api/docs/
+```
+- Run unit tests using following command:
+```py
+make test
 ```
