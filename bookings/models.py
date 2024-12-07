@@ -1,6 +1,7 @@
 from django.db import models
 from spaces.models import Space
 
+
 STATUS = [
     ('pending', 'Pending'),
     ('confirmed', 'Confirmed'),
