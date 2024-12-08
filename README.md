@@ -10,6 +10,7 @@ backend service for managing Soil Spaces, a co-working and community-focused wor
 - Booking conflict prevention.
 - Filter available spaces by type, capacity, or price range.
 - Integrate rate-limiting to prevent abuse of public endpoints.
+- Email notification service for booking state
 
 ## :computer: Technology Stack
 
@@ -38,6 +39,11 @@ DB_PASSWORD=DBpassword
 DB_HOST=db
 DB_PORT=5432
 DEBUG=True
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER=dohaelsawy18@gmail.com
+EMAIL_HOST_PASSWORD=lomsqvrytjfmhlhq
+EMAIL_USE_TLS=True
 ```
 - Run docker:
 ```py
