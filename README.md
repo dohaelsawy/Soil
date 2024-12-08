@@ -25,9 +25,13 @@ backend service for managing Soil Spaces, a co-working and community-focused wor
 - python 
 
 ## :wrench: Installation
-- clone the project using
+- Clone the project using
 ```
 git clone https://github.com/dohaelsawy/Soil.git
+```
+- Navigate to project directory
+```py
+cd Soil
 ```
 - Create .env file in the root of the project and setup the following environments variables:
 ```py
