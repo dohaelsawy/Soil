@@ -16,7 +16,6 @@ backend service for managing Soil Spaces, a co-working and community-focused wor
 
 - Backend Framework: Django framework, Django RESTful framework
 - Database: PostgreSQL
-- Authentication: Role-based authentication
 - Containerization: Docker
 
 ## :hammer_and_wrench: Prerequisites
