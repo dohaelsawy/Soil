@@ -34,7 +34,7 @@ git clone https://github.com/dohaelsawy/Soil.git
 DB_ENGINE=django.db.backends.postgresql
 DB_NAME=soil_spaces_db
 DB_USER=postgres
-DB_PASSWORD=DBpassword
+DB_PASSWORD=soilDBpassword
 DB_HOST=db
 DB_PORT=5432
 DEBUG=True
