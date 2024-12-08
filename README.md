@@ -8,7 +8,7 @@ backend service for managing Soil Spaces, a co-working and community-focused wor
 - Role-based authentication.
 - Input validation.
 - Booking conflict prevention.
-- Filter available spaces by type, capacity, or price range.
+- Filter available spaces by type, capacity, or max price.
 - Integrate rate-limiting to prevent abuse of public endpoints.
 - Email notification service for booking state
 
