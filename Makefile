@@ -12,6 +12,8 @@ setupDependencies:
 	. .venv/bin/activate && pip install -r requirements.txt
 up:
 	docker-compose up
+down:
+	docker-compose down
 superuser:
 	docker-compose run web python manage.py createsuperuser
 swagger:
